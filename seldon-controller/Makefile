@@ -3,7 +3,7 @@ go/src/github.com/seldonio:
 	mkdir -p go/src/github.com/seldonio
 
 go/src/github.com/seldonio/seldon-operator: go/src/github.com/seldonio
-	cd go/src/github.com/seldonio && git clone https://github.com/SeldonIO/seldon-operator.git
+	cd go/src/github.com/seldonio && git clone https://github.com/adamjm/seldon-operator.git && cd seldon-operator && git checkout multi-arch-support && cd ../
 
 .PHONY:build
 build: clean go/src/github.com/seldonio/seldon-operator

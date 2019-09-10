@@ -8,12 +8,18 @@ RUN \
          ca-certificates \
          curl \
          gnupg2 \
-         software-properties-common && \
-    curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add - && \
+         software-properties-common 
+
+ARG ARCH=ppc64el
+RUN echo ${ARCH} ARCH
+RUN echo $(. /etc/os-release; echo "$ID")
+RUN echo $(lsb_release -cs)
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
     add-apt-repository \
-       "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
-       $(lsb_release -cs) \
+       "deb [arch=${ARCH}] https://download.docker.com/linux/ubuntu \
+       xenial \
        stable" && \
+       cat /etc/apt/sources.list && \
     apt-get update && \
     apt-get install -y docker-ce
 
@@ -22,7 +28,7 @@ RUN \
     apt-get install -y vim && \
     apt-get install -y build-essential && \
     apt-get install -y maven && \
-    update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java && \
+    update-alternatives --set java /usr/lib/jvm/java-8-openjdk-${ARCH}/jre/bin/java && \
     apt-get remove -y --auto-remove && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # dependencies for release script

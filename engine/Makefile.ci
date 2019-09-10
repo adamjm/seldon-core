@@ -1,7 +1,7 @@
 IMAGE_NAME=seldonio/engine
 VERSION_FILE=target/version.txt
-
 LOCAL_PRIVATE_REPO=127.0.0.1:5000
+ARCH ?= $(shell uname -m)
 
 # clean and build image
 build: clean build_image
@@ -31,9 +31,16 @@ push_image:
 push_image_private_repo:
 	@set -x && docker push $(LOCAL_PRIVATE_REPO)/$(IMAGE_NAME):$$(cat $(VERSION_FILE))
 
-clean:
+clean:  grpc_${ARCH}
 	mvn clean -B
 	rm -fr src/main/proto/*
+
+grpc_ppc64le:
+	wget https://github.com/grpc/grpc-java/archive/v1.23.0.tar.gz && tar xvf v1.23.0.tar.gz && cd grpc-java-1.23.0/compiler && \
+         ../gradlew -PskipCodegen=true java_pluginExecutable && rm v1.23.0.tar.gz && rm -rf grpc-java-1.23.0/
+
+grpc_amd64:
+	echo ${ARCH}
 
 download_protos_k8s:
 	cd ../proto/k8s ; make create_protos
