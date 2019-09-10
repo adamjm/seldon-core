@@ -35,9 +35,15 @@ clean:  grpc_${ARCH}
 	mvn clean -B
 	rm -fr src/main/proto/*
 
-grpc_ppc64le:
+install_deps:
+	apt-get update && apt-get install -y autoconf build-essential libtool-bin
+
+build_proto: install_deps
+	git clone https://github.com/google/protobuf.git && cd protobuf && git checkout v3.9.0 && ./autogen.sh && ./configure --disable-shared && make -j 64 && make install && cd ../ && rm -rf protobuf 
+
+grpc_ppc64le: build_proto
 	wget https://github.com/grpc/grpc-java/archive/v1.23.0.tar.gz && tar xvf v1.23.0.tar.gz && cd grpc-java-1.23.0/compiler && \
-         ../gradlew -PskipCodegen=true java_pluginExecutable && rm v1.23.0.tar.gz && rm -rf grpc-java-1.23.0/
+         ../gradlew java_pluginExecutable && mvn install:install-file -DgroupId=io.grpc -DartifactId=protoc-gen-grpc-java -Dversion=1.23.0 -Dclassifier=linux-ppcle_64 -Dpackaging=exe -Dfile=build/exe/java_plugin/protoc-gen-grpc-java && cd ../../ && rm v1.23.0.tar.gz 
 
 grpc_amd64:
 	echo ${ARCH}
